@@ -2,9 +2,13 @@ cmake_minimum_required(VERSION 3.10.0)
 project(parallelkalman VERSION 0.1.0 LANGUAGES C CXX)
 
 # add the src directory to the include path
+include_directories(src)
 file(GLOB MAIN 
+    "src/matops.cpp"
     "src/main.cpp"
     "src/*.h"
+    "src/include/*.h"
+
 )
 
 add_executable(parallelkalman ${MAIN})
