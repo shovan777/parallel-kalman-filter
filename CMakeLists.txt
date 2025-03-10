@@ -8,6 +8,7 @@ include_directories(src)
 
 file(GLOB MAIN 
     "src/matops.cpp"
+    "src/linearMotion.cpp"
     "src/main.cpp"
     "src/*.h"
 )
