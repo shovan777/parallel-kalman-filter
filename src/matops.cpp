@@ -38,3 +38,17 @@ matrix* mat_mul(matrix* A, matrix* B) {
     return C;
 }
 
+matrix* mat_add(matrix* A, matrix* B) {
+    matrix* C = new matrix;
+    int m = A->rows;
+    int n = A->cols;
+    C->rows = m;
+    C->cols = n;
+    C->data = (float *)malloc(C->rows * C->cols * sizeof(float));
+    for (int i = 0; i < C->rows; i++) {
+        for (int j = 0; j < C->cols; j++) {
+            C->data[i * C->cols + j] = A->data[i * A->cols + j] + B->data[i * B->cols + j];
+        }
+    }
+    return C;
+}
