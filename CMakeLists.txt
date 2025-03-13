@@ -1,5 +1,8 @@
 cmake_minimum_required(VERSION 3.10.0)
 project(parallelkalman VERSION 0.1.0 LANGUAGES C CXX)
+# set the C++ standard to C++11
+set(CMAKE_CXX_STANDARD 11)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
 enable_testing()
 
 # add the src directory to the include path
