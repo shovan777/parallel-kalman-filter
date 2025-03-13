@@ -12,9 +12,15 @@ sudo dnf install gcc-c++
 - install ninja-build
 - build with cmake
 ```
-cmake -G Ninja -B build
-ninja -C build
+mkdir  build
+cd build
+cmake -G Ninja
+ninja
 ```
+or do this
+```
+CC=/ihome/crc/install/gcc/12.2.0/bin/gcc CXX=/ihome/crc/install/gcc/12.2.0/bin/g++ cmake CC=gcc -G Ninja ..
+``
 - run the program
 ```
 ./build/parallelkalman
