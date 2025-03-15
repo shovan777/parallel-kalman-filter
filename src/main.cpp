@@ -5,7 +5,7 @@
 // just print hello world with cout
 int main()
 {
-    std::cout << "Hello, World!" << std::endl;
+    std::cout << "Hello, World! Test couting!" << std::endl;
     float delta_t = 0.1;
     LinearMotion lm = LinearMotion(
         // motion starts at rest
