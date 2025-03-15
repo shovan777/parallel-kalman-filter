@@ -14,7 +14,7 @@ sudo dnf install gcc-c++
 ```
 mkdir  build
 cd build
-cmake -G Ninja
+cmake -G Ninja ..
 ninja
 ```
 or do this
