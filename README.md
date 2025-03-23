@@ -27,8 +27,11 @@ CC=/ihome/crc/install/gcc/12.2.0/bin/gcc CXX=/ihome/crc/install/gcc/12.2.0/bin/g
 ```
 
 Python part
+
+```
 pip install matplotlib
 pip install pandas
 pip insatll numpy
 
 python plotting_code.py
+```
