@@ -20,7 +20,7 @@ ninja
 or do this
 ```
 CC=/ihome/crc/install/gcc/12.2.0/bin/gcc CXX=/ihome/crc/install/gcc/12.2.0/bin/g++ cmake CC=gcc -G Ninja ..
-``
+```
 - run the program
 ```
 ./build/parallelkalman
