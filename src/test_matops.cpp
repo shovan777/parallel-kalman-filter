@@ -102,14 +102,60 @@ void test_mat_add() {
     assert(C->data[5] == 10);
     assert(C->data[6] == 10);
     assert(C->data[7] == 10);
-    assert(C->data[8] == 0);
+    assert(C->data[8] == 10);
+    free(C->data);
+}
+
+void test_mat_inv() {
+    // Test case 1: 2x2 matrix
+    matrix A;
+    A.rows = 2;
+    A.cols = 2;
+    float dataA[] = {4, 7, 2, 6};
+    A.data = dataA;
+
+    matrix* C = mat_inv(&A);
+
+    assert(C->rows == 2);
+    assert(C->cols == 2);
+    assert(C->data[0] == 0.6f);
+    assert(C->data[1] == -0.7f);
+    assert(C->data[2] == -0.2f);
+    assert(C->data[3] == 0.4f);
+
+    free(C->data);
+
+    // Test case 2: 3x3 matrix
+    A.rows = 3;
+    A.cols = 3;
+    float dataA2[] = {1, 2, 3, 0, 1, 4, 5, 6, 0};
+    A.data = dataA2;
+
+    C = mat_inv(&A);
+
+    assert(C->rows == 3);
+    assert(C->cols == 3);
+    assert(C->data[0] == -24);
+    assert(C->data[1] == 18);
+    assert(C->data[2] == 5);
+    assert(C->data[3] == 20);
+    assert(C->data[4] == -15);
+    assert(C->data[5] == -4);
+    assert(C->data[6] == -5);
+    assert(C->data[7] == 4);
+    assert(C->data[8] == 1);
     free(C->data);
 }
 
 int main() {
     test_mat_mul();
+    std::cout << "mat_mul tests passed!" << std::endl;
     test_mat_add();
+    std::cout << "mat_add tests passed!" << std::endl;
+    test_mat_inv();
+    std::cout << "mat_inv tests passed!" << std::endl;
     std::cout << "All tests passed!" << std::endl;
     return 0;
 }
+
 

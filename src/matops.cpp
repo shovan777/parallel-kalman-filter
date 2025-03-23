@@ -19,14 +19,12 @@ matrix *mat_mul(matrix *A, matrix *B)
     {
         for (int j = 0; j < p; j++)
         {
-            // printf("for element at i=%d, j=%d***********\n", i, j);
             int c_idx = i * p + j;
             C->data[c_idx] = 0.0f;
             for (int k = 0; k < n; k++)
             {
                 C->data[c_idx] += (A->data[i * n + k] * B->data[k * p + j]);
             }
-            // printf("value of c[%d][%d]=%d\n", i, j, c[c_idx]);
         }
     }
     return C;

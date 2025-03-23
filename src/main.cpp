@@ -35,5 +35,35 @@ int main()
 
     std::cout << success;
     
+
+    // check if the matrix inversion works
+    matrix *A = new matrix{2, 2, new float[4]{2.0f, 1.0f, 5.0f, 3.0f}};
+    // matrix *A = new matrix{2, 2, new float[4]{2.0f, 1.0f, 3.0f, 5.0f}};
+    // matrix *A = new matrix{2, 2, new float[4]{0.0f, 1.0f, 1.0f, 1.0f}};
+
+    matrix *A_inv = mat_inv(A);
+    std::cout << "Matrix:" << std::endl;
+    for (int i = 0; i < A->rows; i++)
+    {
+        for (int j = 0; j < A->cols; j++)
+        {
+            std::cout << A->data[i * A->cols + j] << " ";
+        }
+        std::cout << std::endl;        printf("second ops\n");
+
+    }
+    std::cout << "Inverse:" << std::endl;
+    for (int i = 0; i < A_inv->rows; i++)
+    {
+        for (int j = 0; j < A_inv->cols; j++)
+        {
+            std::cout << A_inv->data[i * A_inv->cols + j] << " ";
+        }
+        std::cout << std::endl;
+    }
+    free(A->data);
+    free(A);
+    free(A_inv->data);
+    free(A_inv);
     return 0;
 }
