@@ -1,6 +1,8 @@
 #include <iostream>
 #include "include/matops.h"
 #include "include/linearMotion.h"
+#include "include/plotter.h"
+#include "include/write.h"
 
 // just print hello world with cout
 int main()
@@ -25,5 +27,13 @@ int main()
         free(input_vec->data);
         free(input_vec);
     }
+    double data[20] = {1,2.5,3,4,5,6.5,7,8,9,10,11,12,13,14,15,16,17,18,19};
+
+    //plotter();
+
+    int success = writeDoubles(data);
+
+    std::cout << success;
+    
     return 0;
 }

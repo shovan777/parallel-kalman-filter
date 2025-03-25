@@ -8,10 +8,17 @@ enable_testing()
 # add the src directory to the include path
 include_directories(src)
 
+add_subdirectory(matplotplusplus)
+
+include_directories(/path/to/matplot/include)
+
 
 file(GLOB MAIN 
+    "matplotplusplus/*"
     "src/matops.cpp"
     "src/linearMotion.cpp"
+    "src/plotter.cpp"
+    "src/write.cpp"
     "src/main.cpp"
     "src/*.h"
 )
