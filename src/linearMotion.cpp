@@ -17,14 +17,23 @@ void LinearMotion::setTransitionMatrix(matrix *transition_matrix)
     this->transition_matrix = transition_matrix;
 }
 
-matrix *LinearMotion::updateState(matrix *input_vec)
+void LinearMotion::setStateVector(matrix *state_vec)
+{
+    this->state_vec->data = state_vec->data;
+}
+
+matrix *LinearMotion::getTransitionMatrix()
+{
+    return this->transition_matrix;
+}
+
+void LinearMotion::updateState(matrix *input_vec)
 {
     // update the state vector
-    state_vec = mat_mul(this->transition_matrix, state_vec);
+    this->state_vec = mat_mul(this->transition_matrix, state_vec);
     matrix *temp = mat_mul(this->input_matrix, input_vec);
-    state_vec = mat_add(temp, state_vec);
+    this->state_vec = mat_add(temp, state_vec);
     free(temp->data);
-    return state_vec;
 }
 
 // Destructor
