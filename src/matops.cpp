@@ -48,6 +48,24 @@ matrix *mat_add(matrix *A, matrix *B)
     return C;
 }
 
+matrix *mat_sub(matrix *A, matrix *B)
+{
+    matrix *C = new matrix;
+    int m = A->rows;
+    int n = A->cols;
+    C->rows = m;
+    C->cols = n;
+    C->data = (float *)malloc(C->rows * C->cols * sizeof(float));
+    for (int i = 0; i < C->rows; i++)
+    {
+        for (int j = 0; j < C->cols; j++)
+        {
+            C->data[i * C->cols + j] = A->data[i * A->cols + j] - B->data[i * B->cols + j];
+        }
+    }
+    return C;
+}
+
 matrix *mat_inv(matrix *A)
 {
     //  lets use gauss jordan method and assume that mat A is invertible
@@ -125,4 +143,33 @@ matrix *mat_inv(matrix *A)
         }
     }
     return identity_mat;
+}
+
+matrix* mat_transpose(matrix* A) {
+    matrix* B = new matrix;
+    B->rows = A->cols;
+    B->cols = A->rows;
+    B->data = (float*)malloc(B->rows * B->cols * sizeof(float));
+    for (int i = 0; i < A->rows; i++)
+    {
+        for (int j = 0; j < A->cols; j++)
+        {
+            B->data[j * A->rows + i] = A->data[i * A->cols + j];
+        }
+    }
+    return B;
+}
+
+void display_matrix(matrix* A) {
+    std::cout << "Matrix: " << std::endl;
+    std::cout << "Rows: " << A->rows << ", Cols: " << A->cols << std::endl;
+    std::cout << "Data: " << std::endl;
+    for (int i = 0; i < A->rows; i++)
+    {
+        for (int j = 0; j < A->cols; j++)
+        {
+            std::cout << A->data[i * A->cols + j] << " ";
+        }
+        std::cout << std::endl;
+    }
 }

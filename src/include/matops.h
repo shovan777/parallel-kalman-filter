@@ -11,5 +11,8 @@ struct matrix
 
 matrix *mat_mul(matrix *A, matrix *B);
 matrix *mat_add(matrix *A, matrix *B);
+matrix *mat_sub(matrix *A, matrix *B);
 matrix *mat_inv(matrix *A);
+matrix *mat_transpose(matrix *A);
+void display_matrix(matrix *A);
 #endif // MATOPS_H
