@@ -36,3 +36,5 @@ build/
 
 # ignore test files
 Testing/
+
+.vscode/
