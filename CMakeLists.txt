@@ -16,13 +16,13 @@ endif()
 # add the src directory to the include path
 include_directories(src)
 
-add_subdirectory(matplotplusplus)
+# add_subdirectory(matplotplusplus)
 
 include_directories(/path/to/matplot/include)
 
 
 file(GLOB MAIN 
-    "matplotplusplus/*"
+    # "matplotplusplus/*"
     "src/matops.cpp"
     "src/linearMotion.cpp"
     "src/plotter.cpp"

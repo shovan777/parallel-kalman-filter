@@ -1,7 +1,7 @@
 #include <iostream>
 #include "include/matops.h"
 #include "include/linearMotion.h"
-#include "include/plotter.h"
+// #include "include/plotter.h"
 #include "include/write.h"
 #include <omp.h>
 
@@ -106,29 +106,6 @@ int main()
     int success = writeDoubles(data);
 
     std::cout << success;
-    
-
-    // check if the matrix inversion works
-    matrix *A = new matrix{2, 2, new float[4]{2.0f, 1.0f, 5.0f, 3.0f}};
-    // matrix *A = new matrix{2, 2, new float[4]{2.0f, 1.0f, 3.0f, 5.0f}};
-    // matrix *A = new matrix{2, 2, new float[4]{0.0f, 1.0f, 1.0f, 1.0f}};
-
-    matrix *A_inv = mat_inv(A);
-    std::cout << "Matrix:" << std::endl;
-    for (int i = 0; i < A->rows; i++)
-    {
-        for (int j = 0; j < A->cols; j++)
-        {
-            std::cout << A->data[i * A->cols + j] << " ";
-        }
-        std::cout << std::endl;        printf("second ops\n");
-        free(y_err->data);
-        free(y_err);
-
-        // if (i==1) {
-        //     break;
-        // }
-    }
     printf("Time in microseconds: %f\n", (omp_get_wtime() - start_time) * 1000000);
     // free the memory allocated for the matrices
     // free(stateCOVMat->data);
