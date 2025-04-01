@@ -5,3 +5,4 @@ lib = CDLL('./libhello.so')
 
 # Call the function
 lib.hello()
+lib.kalmanfiltering()
