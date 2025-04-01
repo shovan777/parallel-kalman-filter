@@ -7,10 +7,18 @@
 // return just the pointer to the matrix
 matrix *mat_mul(matrix *A, matrix *B)
 {
-    matrix *C = new matrix;
     int m = A->rows;
     int n = A->cols;
     int p = B->cols;
+
+    // check if the matrix multiplication is possible
+    if (A->cols != B->rows)
+    {
+        printf("Matrix multiplication not possible\n");
+        return NULL;
+    }
+
+    matrix *C = new matrix;
     C->rows = m;
     C->cols = p;
     C->data = (float *)malloc(C->rows * C->cols * sizeof(float));
