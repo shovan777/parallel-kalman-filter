@@ -65,3 +65,12 @@ plt.subplot(133)
 plt.plot(names, values, linewidth=4.0)
 plt.suptitle('Categorical Plotting')
 plt.show()
+
+fig = plt.figure()
+ax = fig.add_subplot(projection='3d')
+
+ax.set_xlabel('X Label')
+ax.set_ylabel('Y Label')
+ax.set_zlabel('Z Label')
+
+plt.show()
