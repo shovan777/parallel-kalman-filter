@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include "include/matops.h"
 #include <iostream>
+#include <omp.h>
 
 // lets define some matrix operations
 // return just the pointer to the matrix
@@ -23,18 +24,23 @@ matrix *mat_mul(matrix *A, matrix *B)
     C->cols = p;
     C->data = (float *)malloc(C->rows * C->cols * sizeof(float));
 
-    for (int i = 0; i < m; i++)
-    {
-        for (int j = 0; j < p; j++)
+    // #pragma omp parallel num_threads(4)
+    // {
+        // #pragma omp for
+        for (int i = 0; i < m; i++)
         {
-            int c_idx = i * p + j;
-            C->data[c_idx] = 0.0f;
-            for (int k = 0; k < n; k++)
+            for (int j = 0; j < p; j++)
             {
-                C->data[c_idx] += (A->data[i * n + k] * B->data[k * p + j]);
+                int c_idx = i * p + j;
+                C->data[c_idx] = 0.0f;
+                for (int k = 0; k < n; k++)
+                {
+                    C->data[c_idx] += (A->data[i * n + k] * B->data[k * p + j]);
+                }
             }
         }
-    }
+    // }
+
     return C;
 }
 
@@ -113,6 +119,9 @@ matrix *mat_inv(matrix *A)
         }
     }
     // 2: start at a(1,1) diagonal element
+    // #pragma omp parallel num_threads(2)
+    // {
+        // #pragma parallel for shared(A, identity_mat)
     for (int row = 0; row < num_rows; row++)
     {
         int pivot_row = row * num_rows;
@@ -123,7 +132,7 @@ matrix *mat_inv(matrix *A)
         if (pivot == 0.0f)
         {
             printf("Matrix is not invertible\n");
-            return NULL;
+            // return NULL;
         }
 
         // divide the row by the pivot
@@ -150,14 +159,16 @@ matrix *mat_inv(matrix *A)
             }
         }
     }
+// }
     return identity_mat;
 }
 
-matrix* mat_transpose(matrix* A) {
-    matrix* B = new matrix;
+matrix *mat_transpose(matrix *A)
+{
+    matrix *B = new matrix;
     B->rows = A->cols;
     B->cols = A->rows;
-    B->data = (float*)malloc(B->rows * B->cols * sizeof(float));
+    B->data = (float *)malloc(B->rows * B->cols * sizeof(float));
     for (int i = 0; i < A->rows; i++)
     {
         for (int j = 0; j < A->cols; j++)
@@ -168,7 +179,8 @@ matrix* mat_transpose(matrix* A) {
     return B;
 }
 
-void display_matrix(matrix* A) {
+void display_matrix(matrix *A)
+{
     std::cout << "Matrix: " << std::endl;
     std::cout << "Rows: " << A->rows << ", Cols: " << A->cols << std::endl;
     std::cout << "Data: " << std::endl;
