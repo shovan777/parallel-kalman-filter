@@ -20,7 +20,7 @@ int writeDoubles(double * data)
 
       //write first 20 values of data into file
 
-      for (int i = 0; i < 20; i++)
+      for (int i = 0; i < 8000; i++)
       {
           myfile << data[i] << ",";
       }
