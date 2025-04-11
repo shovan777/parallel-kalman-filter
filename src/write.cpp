@@ -20,9 +20,11 @@ int writeDoubles(double * data)
 
       //write first 20 values of data into file
 
-      for (int i = 0; i < 8000; i++)
+      for (int i = 0; i < 8; i++)
       {
-          myfile << data[i] << ",";
+          for (int j = 0; j < 1000; j++) {
+              myfile << data[i][j] << ",";
+          }
       }
 
       myfile.close();
