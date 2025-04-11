@@ -5,7 +5,7 @@ import numpy as np
 import pandas as pd
 
 # Read the CSV file
-data1 = np.genfromtxt('file1.csv', delimiter=',', skip_header=1)
+data1 = np.genfromtxt('data.csv', delimiter=',', skip_header=1)
 
 # Display the data
 print(data1)
