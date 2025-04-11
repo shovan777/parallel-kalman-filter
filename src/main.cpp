@@ -3,6 +3,7 @@
 #include <omp.h>
 #include "include/matops.h"
 #include "include/linearMotion.h"
+#include "./src/include/write.h"
 
 
 int main()
@@ -25,6 +26,9 @@ int main()
     matrix *kalmanGainMats[SIZE];
 
     matrix *measurementMats[SIZE];
+	
+	// initialize the plotting matrix
+	float plottingMatrix[8][1000];
 
     for (int i = 0; i < SIZE; i++)
     {
@@ -92,6 +96,8 @@ int main()
             0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0,
             0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0,
         }};
+		
+		plottingMatrix[i] = new matrix{8, 1000, new float[8000]}; 
         
     }
 
@@ -170,6 +176,10 @@ int main()
             // looks good up to this point
 
             // std::cout << "State vector after " << i << " time steps: [" << lm.getStateVector()->data[0] << ", " << lm.getStateVector()->data[1] << "]" << std::endl;
+			
+			for (int j = 0; j < 8; j++) {
+				plottingMatrix[j][i] = lm.getStateVector()->data[j];
+			}
 
             free(input_vec->data);
             free(input_vec);
@@ -177,6 +187,10 @@ int main()
     }
     double end = omp_get_wtime();
     printf("Time taken: %f milli seconds\n", (end - start)*1000);
+	
+	int success = writeDoubles(plottingMatrix);
+	
+	std::cout << success << "<- Success value of writing data";
 
 
     return 0;
