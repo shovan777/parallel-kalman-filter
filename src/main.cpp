@@ -3,13 +3,13 @@
 #include <omp.h>
 #include "include/matops.h"
 #include "include/linearMotion.h"
-
+#include <cmath>
 
 int main()
 {
-    float delta_t = 0.1;
+    double delta_t = 0.1;
     int SIZE = 10;
-
+    
     // intialize an array of 10 linear motion objects
     LinearMotion *lms[SIZE];
     // initialize the 10 state covariance matrices
@@ -28,12 +28,13 @@ int main()
 
     for (int i = 0; i < SIZE; i++)
     {
+        double height = 10.0;
         lms[i] = new LinearMotion(
             // motion starts at rest
-            new matrix{8, 1, new float[8]{0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0}}, // state vector
+            new matrix{8, 1, new double[8]{0.0, 0.0, 0.0, height, 0.0, 0.0, 0.0, 0.0}}, // state vector
     
-            new matrix{8, 8, new float[64]{// transition matrix
-                                           1, 0, 0, 0, delta_t, 0, 0, 0,
+            new matrix{8, 8, new double[64]{// transition matrix
+                                           1, 0.0, 0, 0, delta_t, 0, 0, 0,
                                             0, 1, 0, 0, 0, delta_t, 0, 0, 
                                             0, 0, 1, 0, 0, 0, delta_t, 0, 
                                             0, 0, 0, 1, 0, 0, 0, delta_t, 
@@ -42,40 +43,54 @@ int main()
                                             0, 0, 0, 0, 0, 0, 1, 0, 
                                             0, 0, 0, 0, 0, 0, 0, 1}},
     
-            new matrix{8, 4, new float[32]{// input matrix
+            new matrix{8, 4, new double[32]{// input matrix
                                            0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1}});
 
-        stateCOVMats[i] = new matrix{8, 8, new float[64]{
-            0.01, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
-            0.0, 0.01, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
-            0.0, 0.0, 0.01, 0.0, 0.0, 0.0, 0.0, 0.0,
-            0.0, 0.0, 0.0, 0.01, 0.0, 0.0, 0.0, 0.0,
-            0.0, 0.0, 0.0, 0.0, 0.1, 0.0, 0.0, 0.0,
-            0.0, 0.0, 0.0, 0.0, 0.0, 0.1, 0.0, 0.0,
-            0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.1, 0.0,
-            0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.1,
+
+        double large_unc = pow((2.0*(1.0/20.0)*height),2); // (0.05h)^2
+        double small_unc = pow((10.0*(1.0/160.0)*height),2); //(0.00625h)^2
+        double large_e_unc = pow(exp(1.0) ,-4); //(e^-2)^2
+        double small_e_unc = pow(exp(1.0) ,-10); //(e^-5)^2
+        // double large_unc = 1; // (0.05h)^2
+        // double small_unc = 1; //(0.00625h)^2
+        // double large_e_unc = 1; //(e^-2)^2
+        // double small_e_unc = 1; //(e^-5)^2
+        // printf("***************%Lf %Lf %Lf %Lf %Lf", height, large_unc, small_unc, large_e_unc, small_e_unc);
+
+        
+
+
+        stateCOVMats[i] = new matrix{8, 8, new double[64]{
+            large_unc, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
+            0.0, large_unc, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
+            0.0, 0.0, large_e_unc, 0.0, 0.0, 0.0, 0.0, 0.0,
+            0.0, 0.0, 0.0, large_unc, 0.0, 0.0, 0.0, 0.0,
+            0.0, 0.0, 0.0, 0.0, small_unc, 0.0, 0.0, 0.0,
+            0.0, 0.0, 0.0, 0.0, 0.0, small_unc, 0.0, 0.0,
+            0.0, 0.0, 0.0, 0.0, 0.0, 0.0, small_e_unc, 0.0,
+            0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, small_unc
         }};
 
-        processCOVMats[i] = new matrix{8, 8, new float[64]{
-            0.01, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
-            0.0, 0.01, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
-            0.0, 0.0, 0.01, 0.0, 0.0, 0.0, 0.0, 0.0,
-            0.0, 0.0, 0.0, 0.01, 0.0, 0.0, 0.0, 0.0,
-            0.0, 0.0, 0.0, 0.0, 0.01, 0.0, 0.0, 0.0,
-            0.0, 0.0, 0.0, 0.0, 0.0, 0.01, 0.0, 0.0,
-            0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.01, 0.0,
-            0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.01,
+        processCOVMats[i] = new matrix{8, 8, new double[64]{
+            large_unc, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
+            0.0, large_unc, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
+            0.0, 0.0, large_e_unc, 0.0, 0.0, 0.0, 0.0, 0.0,
+            0.0, 0.0, 0.0, large_unc, 0.0, 0.0, 0.0, 0.0,
+            0.0, 0.0, 0.0, 0.0, small_unc, 0.0, 0.0, 0.0,
+            0.0, 0.0, 0.0, 0.0, 0.0, small_unc, 0.0, 0.0,
+            0.0, 0.0, 0.0, 0.0, 0.0, 0.0, small_e_unc, 0.0,
+            0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, small_unc
         }};
 
-        measurementCOVMats[i] = new matrix{4, 4, new float[16]{
-            0.01, 0.0, 0.0, 0.0,
-            0.0, 0.01, 0.0, 0.0,
-            0.0, 0.0, 0.1, 0.0,
-            0.0, 0.0, 0.0, 0.1
+        measurementCOVMats[i] = new matrix{4, 4, new double[16]{
+            large_unc, 0.0, 0.0, 0.0,
+            0.0, large_unc, 0.0, 0.0,
+            0.0, 0.0, large_e_unc, 0.0,
+            0.0, 0.0, 0.0, large_unc
         }};
 
 
-        kalmanGainMats[i] = new matrix{8, 4, new float[32]{
+        kalmanGainMats[i] = new matrix{8, 4, new double[32]{
             0.0, 0.0, 0.0, 0.0,
             0.0, 0.0, 0.0, 0.0,
             0.0, 0.0, 0.0, 0.0,
@@ -86,37 +101,37 @@ int main()
             0.0, 0.0, 0.0, 0.0    
         }};
 
-        measurementMats[i] = new matrix{4, 8, new float[32]{
+        measurementMats[i] = new matrix{4, 8, new double[32]{
             1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
             0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
             0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0,
-            0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0,
+            0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0
         }};
         
     }
 
-    float accelx = 2.0; // acceleration in x direction
-    float accely = 1.0; // acceleration in y direction
-    float accela = 0.0; // acceleration in angular direction
-    float accelh = 0.0;
+    double accelx = 2.0; // acceleration in x direction
+    double accely = 1.0; // acceleration in y direction
+    double accela = 0.0; // acceleration in angular direction
+    double accelh = 0.0;
 
     // print hello to that this is multi kalman
-    printf("hello ***************************************");
+    printf("hello: ");
 
     // run all 10 kalman filters
     double start = omp_get_wtime();
-    // #pragma omp parallel for num_threads(10)
+    #pragma omp parallel for num_threads(2)
     for(int i=0; i<100; i++)
     {
         for(int k=0; k<SIZE; k++) {
 
-            float accel = 2.0;
+            double accel = 2.0;
             // for constant acceleration
             // TODO: do for variable acceleration
             // TODO: add noise to the acceleration
 
             // prediction step
-            matrix *input_vec = new matrix{4, 1, new float[4]{accelx, accely, accela, accelh}};
+            matrix *input_vec = new matrix{4, 1, new double[4]{accelx, accely, accela, accelh}};
 
             //  prediction step
             //  x = Fx + Bu
@@ -142,7 +157,7 @@ int main()
             //  innovation/error
             //  y_err = z - Hx
             // measurement vector should be supplied from external sensor
-            matrix *y_err = mat_sub(new matrix{4, 1, new float[4]{0.0, 0.0, 0.0, 0.0}}, mat_mul(measurementMats[k], lms[k]->getStateVector()));
+            matrix *y_err = mat_sub(new matrix{4, 1, new double[4]{0.0, 0.0, 0.0, 0.0}}, mat_mul(measurementMats[k], lms[k]->getStateVector()));
             // printf("y_err: %f\n");
             // display_matrix(y_err);
 
@@ -155,7 +170,7 @@ int main()
             // display_matrix(lm.getStateVector());
 
             //  P = (I - KH)P
-            stateCOVMats[k] = mat_mul(mat_sub(new matrix{8, 8, new float[64]{
+            stateCOVMats[k] = mat_mul(mat_sub(new matrix{8, 8, new double[64]{
                 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
                 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
                 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0,
@@ -169,7 +184,7 @@ int main()
             // display_matrix(stateCOVMat);
             // looks good up to this point
 
-            // std::cout << "State vector after " << i << " time steps: [" << lm.getStateVector()->data[0] << ", " << lm.getStateVector()->data[1] << "]" << std::endl;
+            //std::cout << "State vector after " << i << " time steps: [" << lm.getStateVector()->data[0] << ", " << lm.getStateVector()->data[1] << "]" << std::endl;
 
             free(input_vec->data);
             free(input_vec);

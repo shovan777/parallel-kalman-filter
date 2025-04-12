@@ -22,7 +22,7 @@ matrix *mat_mul(matrix *A, matrix *B)
     matrix *C = new matrix;
     C->rows = m;
     C->cols = p;
-    C->data = (float *)malloc(C->rows * C->cols * sizeof(float));
+    C->data = (double *)malloc(C->rows * C->cols * sizeof(double));
 
     // #pragma omp parallel num_threads(4)
     // {
@@ -32,7 +32,7 @@ matrix *mat_mul(matrix *A, matrix *B)
             for (int j = 0; j < p; j++)
             {
                 int c_idx = i * p + j;
-                C->data[c_idx] = 0.0f;
+                C->data[c_idx] = 0.0;
                 for (int k = 0; k < n; k++)
                 {
                     C->data[c_idx] += (A->data[i * n + k] * B->data[k * p + j]);
@@ -51,7 +51,7 @@ matrix *mat_add(matrix *A, matrix *B)
     int n = A->cols;
     C->rows = m;
     C->cols = n;
-    C->data = (float *)malloc(C->rows * C->cols * sizeof(float));
+    C->data = (double *)malloc(C->rows * C->cols * sizeof(double));
     for (int i = 0; i < C->rows; i++)
     {
         for (int j = 0; j < C->cols; j++)
@@ -69,7 +69,7 @@ matrix *mat_sub(matrix *A, matrix *B)
     int n = A->cols;
     C->rows = m;
     C->cols = n;
-    C->data = (float *)malloc(C->rows * C->cols * sizeof(float));
+    C->data = (double *)malloc(C->rows * C->cols * sizeof(double));
     for (int i = 0; i < C->rows; i++)
     {
         for (int j = 0; j < C->cols; j++)
@@ -100,7 +100,7 @@ matrix *mat_inv(matrix *A)
         // throw an error
         return NULL;
     }
-    identity_mat->data = (float *)malloc(num_rows * num_rows * sizeof(float));
+    identity_mat->data = (double *)malloc(num_rows * num_rows * sizeof(double));
 
     // start with an identity matrix
     for (int i = 0; i < num_rows; i++)
@@ -110,11 +110,11 @@ matrix *mat_inv(matrix *A)
             int idx = i * num_rows + j;
             if (i == j)
             {
-                identity_mat->data[idx] = 1.0f;
+                identity_mat->data[idx] = 1.0;
             }
             else
             {
-                identity_mat->data[idx] = 0.0f;
+                identity_mat->data[idx] = 0.0;
             }
         }
     }
@@ -126,14 +126,16 @@ matrix *mat_inv(matrix *A)
     {
         int pivot_row = row * num_rows;
         // get the diagonal element as pivot
-        float pivot = A->data[pivot_row + row];
+        double pivot = A->data[pivot_row + row];
 
         // if pivot is zero, matrix is not invertible
-        if (pivot == 0.0f)
+        if (pivot == 0.0)
         {
-            printf("Matrix is not invertible\n");
+            printf("Matrix is not invertible %f\n", pivot);
             // return NULL;
         }
+        // pivot = 0.0;
+        // printf("div by zero %f",8/pivot);
 
         // divide the row by the pivot
         for (int col = 0; col < num_rows; col++)
@@ -150,7 +152,7 @@ matrix *mat_inv(matrix *A)
                 continue;
             }
             int cur_row = j * num_rows;
-            float factor = A->data[cur_row + row];
+            double factor = A->data[cur_row + row];
             // every other element in that row is subtractor by factor times pivot row
             for (int col = 0; col < num_rows; col++)
             {
@@ -168,7 +170,7 @@ matrix *mat_transpose(matrix *A)
     matrix *B = new matrix;
     B->rows = A->cols;
     B->cols = A->rows;
-    B->data = (float *)malloc(B->rows * B->cols * sizeof(float));
+    B->data = (double *)malloc(B->rows * B->cols * sizeof(double));
     for (int i = 0; i < A->rows; i++)
     {
         for (int j = 0; j < A->cols; j++)
