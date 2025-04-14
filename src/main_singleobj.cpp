@@ -8,12 +8,12 @@
 // just print hello world with cout
 int main()
 {
-    float delta_t = 0.1;
+    double delta_t = 0.1;
     LinearMotion lm = LinearMotion(
         // motion starts at rest
-        new matrix{8, 1, new float[8]{0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0}}, // state vector
+        new matrix{8, 1, new double[8]{0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0}}, // state vector
 
-        new matrix{8, 8, new float[64]{// transition matrix
+        new matrix{8, 8, new double[64]{// transition matrix
                                        1, 0, 0, 0, delta_t, 0, 0, 0,
                                         0, 1, 0, 0, 0, delta_t, 0, 0, 
                                         0, 0, 1, 0, 0, 0, delta_t, 0, 
@@ -23,12 +23,12 @@ int main()
                                         0, 0, 0, 0, 0, 0, 1, 0, 
                                         0, 0, 0, 0, 0, 0, 0, 1}},
 
-        new matrix{8, 4, new float[32]{// input matrix
+        new matrix{8, 4, new double[32]{// input matrix
                                        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1}});
 
     // initialize
     // state covariance matrix
-    matrix *stateCOVMat = new matrix{8, 8, new float[64]{
+    matrix *stateCOVMat = new matrix{8, 8, new double[64]{
         0.01, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
         0.0, 0.01, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
         0.0, 0.0, 0.01, 0.0, 0.0, 0.0, 0.0, 0.0,
@@ -41,7 +41,7 @@ int main()
     // printf("State covariance matrix:\n");
     // display_matrix(stateCOVMat);
     // process noise covariance matrix
-    matrix *processCOVMat = new matrix{8, 8, new float[64]{
+    matrix *processCOVMat = new matrix{8, 8, new double[64]{
         0.01, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
         0.0, 0.01, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
         0.0, 0.0, 0.01, 0.0, 0.0, 0.0, 0.0, 0.0,
@@ -54,8 +54,8 @@ int main()
     // printf("Process noise covariance matrix:\n");
     // display_matrix(processCOVMat);
     // measurement noise covariance matrix
-    // matrix *measurementCOVMat = new matrix{2, 2, new float[4]{0.0, 0.05, 0.0, 0.05}};
-    matrix *measurementCOVMat = new matrix{4, 4, new float[16]{
+    // matrix *measurementCOVMat = new matrix{2, 2, new double[4]{0.0, 0.05, 0.0, 0.05}};
+    matrix *measurementCOVMat = new matrix{4, 4, new double[16]{
         0.01, 0.0, 0.0, 0.0,
         0.0, 0.01, 0.0, 0.0,
         0.0, 0.0, 0.1, 0.0,
@@ -64,7 +64,7 @@ int main()
     // printf("Measurement noise covariance matrix:\n");
     // display_matrix(measurementCOVMat);
     // kalman gain matrix
-    matrix *kalmanGainMat = new matrix{8, 4, new float[32]{
+    matrix *kalmanGainMat = new matrix{8, 4, new double[32]{
         0.0, 0.0, 0.0, 0.0,
         0.0, 0.0, 0.0, 0.0,
         0.0, 0.0, 0.0, 0.0,
@@ -77,7 +77,7 @@ int main()
     // printf("Kalman gain matrix:\n");
     // display_matrix(kalmanGainMat);
     // measurement matrix
-    matrix *measurementMat = new matrix{4, 8, new float[32]{
+    matrix *measurementMat = new matrix{4, 8, new double[32]{
         1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
         0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
         0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0,
@@ -86,10 +86,10 @@ int main()
     // printf("Measurement matrix:\n");
     // display_matrix(measurementMat);
 
-    float accelx = 2.0; // acceleration in x direction
-    float accely = 1.0; // acceleration in y direction
-    float accela = 0.0; // acceleration in angular direction
-    float accelh = 0.0;
+    double accelx = 2.0; // acceleration in x direction
+    double accely = 1.0; // acceleration in y direction
+    double accela = 0.0; // acceleration in angular direction
+    double accelh = 0.0;
 
     // use openmp to get running time
     double start_time = omp_get_wtime();
@@ -97,12 +97,12 @@ int main()
     for (int i = 0; i < 10; i++)
     {
         // for constant acceleration
-        float accel = 2.0;
+        double accel = 2.0;
         // TODO: do for variable acceleration
         // TODO: add noise to the acceleration
 
         // prediction step
-        matrix *input_vec = new matrix{4, 1, new float[4]{accelx, accely, accela, accelh}};
+        matrix *input_vec = new matrix{4, 1, new double[4]{accelx, accely, accela, accelh}};
 
         //  prediction step
         //  x = Fx + Bu
@@ -128,7 +128,7 @@ int main()
         //  innovation/error
         //  y_err = z - Hx
         // measurement vector should be supplied from external sensor
-        matrix *y_err = mat_sub(new matrix{4, 1, new float[4]{0.0, 0.0, 0.0, 0.0}}, mat_mul(measurementMat, lm.getStateVector()));
+        matrix *y_err = mat_sub(new matrix{4, 1, new double[4]{0.0, 0.0, 0.0, 0.0}}, mat_mul(measurementMat, lm.getStateVector()));
         // printf("y_err: %f\n");
         // display_matrix(y_err);
 
@@ -141,7 +141,7 @@ int main()
         // display_matrix(lm.getStateVector());
 
         //  P = (I - KH)P
-        stateCOVMat = mat_mul(mat_sub(new matrix{8, 8, new float[64]{
+        stateCOVMat = mat_mul(mat_sub(new matrix{8, 8, new double[64]{
             1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
             0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
             0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0,
@@ -166,7 +166,7 @@ int main()
 
     // plotter();
 
-    int success = writeDoubles(data);
+    int success = writedoubles(data);
 
     std::cout << success;
     // free the memory allocated for the matrices

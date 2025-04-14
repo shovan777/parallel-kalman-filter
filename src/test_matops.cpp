@@ -7,13 +7,13 @@ void test_mat_mul() {
     matrix A;
     A.rows = 2;
     A.cols = 2;
-    float dataA[] = {1, 2, 3, 4};
+    double dataA[] = {1, 2, 3, 4};
     A.data = dataA;
 
     matrix B;
     B.rows = 2;
     B.cols = 2;
-    float dataB[] = {5, 6, 7, 8};
+    double dataB[] = {5, 6, 7, 8};
     B.data = dataB;
 
     matrix* C = mat_mul(&A, &B);
@@ -30,12 +30,12 @@ void test_mat_mul() {
     // Test case 2: 3x3 matrices
     A.rows = 3;
     A.cols = 3;
-    float dataA2[] = {1, 2, 3, 4, 5, 6, 7, 8, 9};
+    double dataA2[] = {1, 2, 3, 4, 5, 6, 7, 8, 9};
     A.data = dataA2;
 
     B.rows = 3;
     B.cols = 3;
-    float dataB2[] = {9, 8, 7, 6, 5, 4, 3, 2, 1};
+    double dataB2[] = {9, 8, 7, 6, 5, 4, 3, 2, 1};
     B.data = dataB2;
 
     C = mat_mul(&A, &B);
@@ -59,13 +59,13 @@ void test_mat_add() {
     matrix A;
     A.rows = 2;
     A.cols = 2;
-    float dataA[] = {1, 2, 3, 4};
+    double dataA[] = {1, 2, 3, 4};
     A.data = dataA;
 
     matrix B;
     B.rows = 2;
     B.cols = 2;
-    float dataB[] = {5, 6, 7, 8};
+    double dataB[] = {5, 6, 7, 8};
     B.data = dataB;
 
     matrix* C = mat_add(&A, &B);
@@ -82,12 +82,12 @@ void test_mat_add() {
     // Test case 2: 3x3 matrices
     A.rows = 3;
     A.cols = 3;
-    float dataA2[] = {1, 2, 3, 4, 5, 6, 7, 8, 9};
+    double dataA2[] = {1, 2, 3, 4, 5, 6, 7, 8, 9};
     A.data = dataA2;
 
     B.rows = 3;
     B.cols = 3;
-    float dataB2[] = {9, 8, 7, 6, 5, 4, 3, 2, 1};
+    double dataB2[] = {9, 8, 7, 6, 5, 4, 3, 2, 1};
     B.data = dataB2;
 
     C = mat_add(&A, &B);
@@ -111,7 +111,7 @@ void test_mat_inv() {
     matrix A;
     A.rows = 2;
     A.cols = 2;
-    float dataA[] = {4, 7, 2, 6};
+    double dataA[] = {4, 7, 2, 6};
     A.data = dataA;
 
     matrix* C = mat_inv(&A);
@@ -128,7 +128,7 @@ void test_mat_inv() {
     // Test case 2: 3x3 matrix
     A.rows = 3;
     A.cols = 3;
-    float dataA2[] = {1, 2, 3, 0, 1, 4, 5, 6, 0};
+    double dataA2[] = {1, 2, 3, 0, 1, 4, 5, 6, 0};
     A.data = dataA2;
 
     C = mat_inv(&A);
