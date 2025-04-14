@@ -4,11 +4,12 @@
 #include "include/matops.h"
 #include "include/linearMotion.h"
 #include <cmath>
+#include <random>
 
 int main()
 {
     double delta_t = 0.1;
-    int SIZE = 10;
+    int SIZE = 100;
     
     // intialize an array of 10 linear motion objects
     LinearMotion *lms[SIZE];
@@ -28,7 +29,9 @@ int main()
 
     for (int i = 0; i < SIZE; i++)
     {
-        double height = 10.0;
+        // we are randomizing height between 50 and 150 pixels which is kinda common
+        double height = rand() % (150 - 50 + 1) + 50;
+        // double height = height;
         lms[i] = new LinearMotion(
             // motion starts at rest
             new matrix{8, 1, new double[8]{0.0, 0.0, 0.0, height, 0.0, 0.0, 0.0, 0.0}}, // state vector
@@ -44,7 +47,14 @@ int main()
                                             0, 0, 0, 0, 0, 0, 0, 1}},
     
             new matrix{8, 4, new double[32]{// input matrix
-                                           0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1}});
+                                           0, 0, 0, 0, 
+                                           0, 0, 0, 0, 
+                                           0, 0, 0, 0, 
+                                           0, 0, 0, 0, 
+                                           1, 0, 0, 0, 
+                                           0, 1, 0, 0, 
+                                           0, 0, 1, 0, 
+                                           0, 0, 0, 1}});
 
 
         double large_unc = pow((2.0*(1.0/20.0)*height),2); // (0.05h)^2
@@ -109,23 +119,31 @@ int main()
         }};
         
     }
+    std::random_device rd;
+    std::mt19937 gen(rd());
+    std::uniform_real_distribution<> accel_dist(-3.0, 3.0);
 
-    double accelx = 2.0; // acceleration in x direction
-    double accely = 1.0; // acceleration in y direction
-    double accela = 0.0; // acceleration in angular direction
-    double accelh = 0.0;
-
+    
     // print hello to that this is multi kalman
-    printf("hello: ");
-
+    // printf("hello: ");
+    
     // run all 10 kalman filters
     double start = omp_get_wtime();
-    #pragma omp parallel for num_threads(2)
+    
+    // #pragma omp parallel for num_threads(16) schedule(dynamic)
     for(int i=0; i<100; i++)
     {
+        #pragma omp parallel for num_threads(4) schedule(static)
         for(int k=0; k<SIZE; k++) {
+            // we have now randomized accelerations in x and y direction between -3 and 3 m/s which is pretty common
+            // additionally we randomized angular acceleration which is very small 
+            // we are also saying height acceleration isnt there cuz we say camera is 
+            // fixed and height of predestrians does not change
+            double accelx = accel_dist(gen); // acceleration in x direction
+            double accely = accel_dist(gen); // acceleration in y direction
+            double accela = ((double)rand() / RAND_MAX) * 0.2 - 0.1; // acceleration in angular direction
+            double accelh = 0.0;
 
-            double accel = 2.0;
             // for constant acceleration
             // TODO: do for variable acceleration
             // TODO: add noise to the acceleration
@@ -191,7 +209,8 @@ int main()
         }
     }
     double end = omp_get_wtime();
-    printf("Time taken: %f milli seconds\n", (end - start)*1000);
+    //printf("Time taken: %f ms\n", (end - start)*1000);
+    printf("Time taken: %.2f ms\n", (end - start) * 1000);
 
 
     return 0;
