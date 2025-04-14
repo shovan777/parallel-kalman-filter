@@ -26,5 +26,6 @@ int writeDoubles(double * data)
       }
 
       myfile.close();
+      std::cout << "WRITE SUCCESSFUL" << std::endl;
       return 0;
 }
