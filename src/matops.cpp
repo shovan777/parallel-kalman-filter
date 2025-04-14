@@ -2,180 +2,177 @@
 #include <stdlib.h>
 #include "include/matops.h"
 #include <iostream>
+#include <omp.h>
+#include <malloc.h>
 
-// lets define some matrix operations
-// return just the pointer to the matrix
-matrix *mat_mul(matrix *A, matrix *B)
-{
+// Set number of threads globally
+// Call this at the beginning of your main() function
+// Example:
+// int main() {
+//     omp_set_num_threads(8);  // Use 8 threads
+//     ...
+// }
+
+// Macro for aligning memory to cache line boundaries (e.g., 64 bytes)
+#define ALIGNMENT 64
+
+// Custom memory allocation for cache alignment
+void* aligned_malloc(size_t size) {
+    void* ptr;
+    if (posix_memalign(&ptr, ALIGNMENT, size) != 0) {
+        printf("Memory allocation failed\n");
+        exit(1);
+    }
+    return ptr;
+}
+
+matrix* mat_mul(matrix* A, matrix* B) {
     int m = A->rows;
     int n = A->cols;
     int p = B->cols;
 
-    // check if the matrix multiplication is possible
-    if (A->cols != B->rows)
-    {
+    if (A->cols != B->rows) {
         printf("Matrix multiplication not possible\n");
         return NULL;
     }
 
-    matrix *C = new matrix;
+    matrix* C = new matrix;
     C->rows = m;
     C->cols = p;
-    C->data = (float *)malloc(C->rows * C->cols * sizeof(float));
+    C->data = (float*)aligned_malloc(m * p * sizeof(float));
 
-    for (int i = 0; i < m; i++)
-    {
-        for (int j = 0; j < p; j++)
-        {
-            int c_idx = i * p + j;
-            C->data[c_idx] = 0.0f;
-            for (int k = 0; k < n; k++)
-            {
-                C->data[c_idx] += (A->data[i * n + k] * B->data[k * p + j]);
+    #pragma omp parallel for
+    for (int i = 0; i < m; i++) {
+        for (int j = 0; j < p; j++) {
+            float sum = 0.0f;
+            #pragma omp simd reduction(+:sum)
+            for (int k = 0; k < n; k++) {
+                sum += A->data[i * n + k] * B->data[k * p + j];
             }
+            C->data[i * p + j] = sum;
         }
     }
+
     return C;
 }
 
-matrix *mat_add(matrix *A, matrix *B)
-{
-    matrix *C = new matrix;
-    int m = A->rows;
-    int n = A->cols;
-    C->rows = m;
-    C->cols = n;
-    C->data = (float *)malloc(C->rows * C->cols * sizeof(float));
-    for (int i = 0; i < C->rows; i++)
-    {
-        for (int j = 0; j < C->cols; j++)
-        {
-            C->data[i * C->cols + j] = A->data[i * A->cols + j] + B->data[i * B->cols + j];
-        }
+matrix* mat_add(matrix* A, matrix* B) {
+    if (A->rows != B->rows || A->cols != B->cols)
+        return NULL;
+
+    int size = A->rows * A->cols;
+    matrix* C = new matrix;
+    C->rows = A->rows;
+    C->cols = A->cols;
+    C->data = (float*)aligned_malloc(size * sizeof(float));
+
+    #pragma omp parallel for
+    for (int i = 0; i < size; i++) {
+        C->data[i] = A->data[i] + B->data[i];
     }
+
     return C;
 }
 
-matrix *mat_sub(matrix *A, matrix *B)
-{
-    matrix *C = new matrix;
-    int m = A->rows;
-    int n = A->cols;
-    C->rows = m;
-    C->cols = n;
-    C->data = (float *)malloc(C->rows * C->cols * sizeof(float));
-    for (int i = 0; i < C->rows; i++)
-    {
-        for (int j = 0; j < C->cols; j++)
-        {
-            C->data[i * C->cols + j] = A->data[i * A->cols + j] - B->data[i * B->cols + j];
-        }
+matrix* mat_sub(matrix* A, matrix* B) {
+    if (A->rows != B->rows || A->cols != B->cols)
+        return NULL;
+
+    int size = A->rows * A->cols;
+    matrix* C = new matrix;
+    C->rows = A->rows;
+    C->cols = A->cols;
+    C->data = (float*)aligned_malloc(size * sizeof(float));
+
+    #pragma omp parallel for
+    for (int i = 0; i < size; i++) {
+        C->data[i] = A->data[i] - B->data[i];
     }
+
     return C;
 }
 
-matrix *mat_inv(matrix *A)
-{
-    //  lets use gauss jordan method and assume that mat A is invertible
-    //  i.e A is also square
-    // steps
-    // 1: begin by creating a n by 2n matrix where n is dim(A)
-    int num_rows = A->rows;
-    matrix *identity_mat = new matrix;
-    identity_mat->rows = num_rows;
-    identity_mat->cols = num_rows;
+matrix* mat_inv(matrix* A) {
+    int n = A->rows;
 
-    // only invert square matrices else raise error
-    if (A->cols != num_rows)
-    {
-        // print an error
-        printf("Only square matrix has an inverse");
-
-        // throw an error
+    if (A->cols != n) {
+        printf("Only square matrices can be inverted\n");
         return NULL;
     }
-    identity_mat->data = (float *)malloc(num_rows * num_rows * sizeof(float));
 
-    // start with an identity matrix
-    for (int i = 0; i < num_rows; i++)
-    {
-        for (int j = 0; j < num_rows; j++)
-        {
-            int idx = i * num_rows + j;
-            if (i == j)
-            {
-                identity_mat->data[idx] = 1.0f;
-            }
-            else
-            {
-                identity_mat->data[idx] = 0.0f;
-            }
+    matrix* identity = new matrix;
+    identity->rows = n;
+    identity->cols = n;
+    identity->data = (float*)aligned_malloc(n * n * sizeof(float));
+
+    #pragma omp parallel for
+    for (int i = 0; i < n; i++) {
+        for (int j = 0; j < n; j++) {
+            identity->data[i * n + j] = (i == j) ? 1.0f : 0.0f;
         }
     }
-    // 2: start at a(1,1) diagonal element
-    for (int row = 0; row < num_rows; row++)
-    {
-        int pivot_row = row * num_rows;
-        // get the diagonal element as pivot
-        float pivot = A->data[pivot_row + row];
 
-        // if pivot is zero, matrix is not invertible
-        if (pivot == 0.0f)
-        {
+    matrix* A_copy = new matrix;
+    A_copy->rows = n;
+    A_copy->cols = n;
+    A_copy->data = (float*)aligned_malloc(n * n * sizeof(float));
+
+    #pragma omp parallel for
+    for (int i = 0; i < n * n; i++) {
+        A_copy->data[i] = A->data[i];
+    }
+
+    for (int row = 0; row < n; row++) {
+        float pivot = A_copy->data[row * n + row];
+        if (pivot == 0.0f) {
             printf("Matrix is not invertible\n");
+            free(A_copy->data);
+            delete A_copy;
             return NULL;
         }
 
-        // divide the row by the pivot
-        for (int col = 0; col < num_rows; col++)
-        {
-            A->data[row * num_rows + col] /= pivot;
-            identity_mat->data[row * num_rows + col] /= pivot;
+        for (int col = 0; col < n; col++) {
+            A_copy->data[row * n + col] /= pivot;
+            identity->data[row * n + col] /= pivot;
         }
 
-        // eliminate all other elements in that [row][row] to zero
-        for (int j = 0; j < num_rows; j++)
-        {
-            if (row == j)
-            {
-                continue;
-            }
-            int cur_row = j * num_rows;
-            float factor = A->data[cur_row + row];
-            // every other element in that row is subtractor by factor times pivot row
-            for (int col = 0; col < num_rows; col++)
-            {
-                A->data[cur_row + col] -= factor * A->data[pivot_row + col];
-                identity_mat->data[cur_row + col] -= factor * identity_mat->data[pivot_row + col];
+        #pragma omp parallel for
+        for (int j = 0; j < n; j++) {
+            if (j == row) continue;
+            float factor = A_copy->data[j * n + row];
+            for (int col = 0; col < n; col++) {
+                A_copy->data[j * n + col] -= factor * A_copy->data[row * n + col];
+                identity->data[j * n + col] -= factor * identity->data[row * n + col];
             }
         }
     }
-    return identity_mat;
+
+    free(A_copy->data);
+    delete A_copy;
+    return identity;
 }
 
 matrix* mat_transpose(matrix* A) {
     matrix* B = new matrix;
     B->rows = A->cols;
     B->cols = A->rows;
-    B->data = (float*)malloc(B->rows * B->cols * sizeof(float));
-    for (int i = 0; i < A->rows; i++)
-    {
-        for (int j = 0; j < A->cols; j++)
-        {
+    B->data = (float*)aligned_malloc(B->rows * B->cols * sizeof(float));
+
+    #pragma omp parallel for
+    for (int i = 0; i < A->rows; i++) {
+        for (int j = 0; j < A->cols; j++) {
             B->data[j * A->rows + i] = A->data[i * A->cols + j];
         }
     }
+
     return B;
 }
 
 void display_matrix(matrix* A) {
     std::cout << "Matrix: " << std::endl;
     std::cout << "Rows: " << A->rows << ", Cols: " << A->cols << std::endl;
-    std::cout << "Data: " << std::endl;
-    for (int i = 0; i < A->rows; i++)
-    {
-        for (int j = 0; j < A->cols; j++)
-        {
+    for (int i = 0; i < A->rows; i++) {
+        for (int j = 0; j < A->cols; j++) {
             std::cout << A->data[i * A->cols + j] << " ";
         }
         std::cout << std::endl;
