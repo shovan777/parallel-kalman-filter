@@ -5,6 +5,8 @@
 #include "./src/include/write.h"
 #include <omp.h>
 
+#include "./src/include/timer.h"
+
 extern "C" void hello() {
     std::cout << "Hello from shared C++ library!" << std::endl;
 }
@@ -50,6 +52,8 @@ int kalmanfiltering()
     
     // use openmp to get running time
     double start_time = omp_get_wtime();
+    Timer t;
+
     // lets generate a sequence of input vectors
     for (int i = 0; i < 10; i++)
     {
@@ -109,6 +113,11 @@ int kalmanfiltering()
         free(input_vec->data);
         free(input_vec);
     }
+
+    // Code to time goes here
+
+    std::cout << "Time elapsed: " << t.elapsed() << " seconds\n";
+    
     printf("Time in microseconds: %f\n", (omp_get_wtime() - start_time) * 1000000);
     double data[20] = {1,2.5,3,4,5,6.5,7,8,9,10,11,12,13,14,15,16,17,18,19};
 
