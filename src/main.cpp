@@ -5,6 +5,8 @@
 #include "include/write.h"
 #include <omp.h>
 
+#include "include/timer.h"
+
 // just print hello world with cout
 int main()
 {
@@ -92,9 +94,13 @@ int main()
     float accelh = 0.0;
 
     // use openmp to get running time
-    double start_time = omp_get_wtime();
+    // double start_time = omp_get_wtime();
+
+    Timer t;
+
+
     // lets generate a sequence of input vectors
-    for (int i = 0; i < 10; i++)
+    for (int i = 0; i < 100; i++)
     {
         // for constant acceleration
         float accel = 2.0;
@@ -160,7 +166,18 @@ int main()
         free(input_vec->data);
         free(input_vec);
     }
-    printf("Time in microseconds: %f\n", (omp_get_wtime() - start_time) * 1000000);
+
+    // Code to time goes here
+
+    std::cout << "Time elapsed: " << t.elapsed() << " seconds\n";
+    
+    //printf("Time in microseconds: %f\n", (omp_get_wtime() - start_time) * 1000000);
+
+ 
+
+    
+
+    return 0;
 
     double data[20] = {1, 2.5, 3, 4, 5, 6.5, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19};
 
