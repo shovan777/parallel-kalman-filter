@@ -5,7 +5,7 @@ import numpy as np
 import pandas as pd
 
 # Read the CSV file
-data1 = np.genfromtxt('file1.csv', delimiter=',', skip_header=1)
+data1 = np.genfromtxt('data.csv', delimiter=',', skip_header=1)
 
 # Display the data
 print(data1)
@@ -64,4 +64,13 @@ plt.scatter(names, values)
 plt.subplot(133)
 plt.plot(names, values, linewidth=4.0)
 plt.suptitle('Categorical Plotting')
+plt.show()
+
+fig = plt.figure()
+ax = fig.add_subplot(projection='3d')
+
+ax.set_xlabel('X Label')
+ax.set_ylabel('Y Label')
+ax.set_zlabel('Z Label')
+
 plt.show()
