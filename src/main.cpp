@@ -8,9 +8,9 @@
 
 int main()
 {
-    double delta_t = 0.1;
-    int SIZE = 100;
-    
+    float delta_t = 0.1;
+    int SIZE = 1000;
+
     // intialize an array of 10 linear motion objects
     LinearMotion *lms[SIZE];
     // initialize the 10 state covariance matrices
