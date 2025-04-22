@@ -2,54 +2,297 @@ import numpy as np
 import matplotlib.pyplot as plt
 from io import StringIO
 
-# Read and filter lines before the first star, skipping empty lines
-lines = []
+# Read file
 with open("./build/data.csv", "r") as f:
-    for line in f:
-        if '*' in line:  # Stop reading if a star is encountered
-            break
-        if line.strip():  # Only add non-empty lines
-            lines.append(line)
+    raw_data = f.read()
 
-# Join the lines and pass to StringIO to simulate a file-like object
-data_string = "".join(lines)
+# Split by object
+object_chunks = [chunk.strip() for chunk in raw_data.split("*") if chunk.strip()]
+print(object_chunks)
 
-# Remove any trailing empty lines (or lines that contain only commas)
-data_string = "\n".join([line for line in data_string.splitlines() if line.strip(',')])
+parsed_objects = []
 
-# Now, we will use np.genfromtxt to read the data and handle malformed rows
-try:
-    data = np.genfromtxt(StringIO(data_string), delimiter=",", skip_header=0, filling_values=np.nan)
+for i, chunk in enumerate(object_chunks):
+    lines = [line for line in chunk.splitlines() if line.strip(',').strip()]
+    if not lines:
+        print(f"Object {i+1} has no valid lines.")
+        continue
+
+    try:
+        # Parse the data
+        data = np.genfromtxt(StringIO("\n".join(lines)), delimiter=",", filling_values=np.nan)
+
+        # Check for abnormal or overflow values (e.g., values that are too large or too small)
+        if np.any(np.abs(data) > 1e10):  # Replace with a threshold value suitable for your data
+            print(f"Warning: Object {i+1} contains unusually large values, replacing with NaN.")
+            data[np.abs(data) > 1e10] = np.nan  # Replace abnormal values with NaN
+
+        # If data has only one row, reshape it
+        if data.ndim == 1:
+            data = np.expand_dims(data, axis=0)
+
+        # Ensure the object has enough rows
+        if data.shape[0] >= 2:
+            parsed_objects.append(data)
+            print(f"Parsed Object {i+1}: shape {data.shape}")
+        else:
+            print(f"Object {i+1} skipped — not enough rows.")
+    except Exception as e:
+        print(f"Error parsing Object {i+1}: {e}")
+
+# Plotting
+if not parsed_objects:
+    print("No valid object data parsed.")
+else:
+    plt.figure(figsize=(10, 8))
+
+    for idx, data in enumerate(parsed_objects):
+        # Exclude NaN values before plotting
+        x = data[0, :]
+        y = data[1, :]
+        
+        # Remove NaN values
+        valid_indices = np.isfinite(x) & np.isfinite(y)
+        x_valid = x[valid_indices]
+        y_valid = y[valid_indices]
+        
+        plt.plot(x_valid, y_valid, label=f"Object {idx + 1}", linewidth=2)
+
+    plt.title("2D Trajectories of All Objects")
+    plt.xlabel("X Position")
+    plt.ylabel("Y Position")
+    plt.legend()
+    plt.grid(True)
+    plt.tight_layout()
+    plt.savefig("all_objects_one_plot.png")
+    plt.show()
+
+
+# import numpy as np
+# import matplotlib.pyplot as plt
+# from io import StringIO
+
+# # Read file
+# with open("./build/data.csv", "r") as f:
+#     raw_data = f.read()
+
+# # Split by object
+# object_chunks = [chunk.strip() for chunk in raw_data.split("*") if chunk.strip()]
+# print(object_chunks)
+
+# parsed_objects = []
+
+# for i, chunk in enumerate(object_chunks):
+#     lines = [line for line in chunk.splitlines() if line.strip(',').strip()]
+#     if not lines:
+#         print(f"Object {i+1} has no valid lines.")
+#         continue
+
+#     try:
+#         data = np.genfromtxt(StringIO("\n".join(lines)), delimiter=",", filling_values=np.nan)
+#         if data.ndim == 1:
+#             data = np.expand_dims(data, axis=0)
+#         if data.shape[0] >= 2:
+#             parsed_objects.append(data)
+#             print(f"Parsed Object {i+1}: shape {data.shape}")
+#         else:
+#             print(f"Object {i+1} skipped — not enough rows.")
+#     except Exception as e:
+#         print(f"Error parsing Object {i+1}: {e}")
+
+# # Plotting
+# if not parsed_objects:
+#     print("No valid object data parsed.")
+# else:
+#     plt.figure(figsize=(10, 8))
+
+#     for idx, data in enumerate(parsed_objects):
+#         x = data[0, :]
+#         y = data[1, :]
+#         plt.plot(x, y, label=f"Object {idx + 1}", linewidth=2)
+
+#     plt.title("2D Trajectories of All Objects")
+#     plt.xlabel("X Position")
+#     plt.ylabel("Y Position")
+#     plt.legend()
+#     plt.grid(True)
+#     plt.tight_layout()
+#     plt.savefig("all_objects_one_plot.png")
+#     plt.show()
+
+
+# import numpy as np
+# import matplotlib.pyplot as plt
+# from io import StringIO
+
+# # Read and parse the file
+# with open("./build/data.csv", "r") as f:
+#     raw_data = f.read()
+
+# # Split into object chunks
+# object_chunks = [chunk.strip() for chunk in raw_data.split("*") if chunk.strip()]
+
+# parsed_objects = []
+
+# for chunk in object_chunks:
+#     lines = [line for line in chunk.splitlines() if line.strip(',').strip()]
+#     if not lines:
+#         continue
+
+#     try:
+#         data = np.genfromtxt(StringIO("\n".join(lines)), delimiter=",", filling_values=np.nan)
+#         if data.ndim == 1:
+#             data = np.expand_dims(data, axis=0)
+#         if data.shape[0] >= 2:
+#             parsed_objects.append(data)
+#     except Exception as e:
+#         print(f"Error parsing chunk: {e}")
+
+# # Plot all objects on the same figure
+# if not parsed_objects:
+#     print("No valid data found.")
+# else:
+#     plt.figure(figsize=(10, 8))
+
+#     for idx, data in enumerate(parsed_objects):
+#         x = data[0, :]
+#         y = data[1, :]
+#         plt.plot(x, y, label=f"Object {idx + 1}", linewidth=2)
+
+#     plt.title("2D Trajectories of All Objects")
+#     plt.xlabel("X Position")
+#     plt.ylabel("Y Position")
+#     plt.legend()
+#     plt.grid(True)
+#     plt.tight_layout()
+#     plt.savefig("all_objects_one_plot.png")
+#     plt.show()
+
+# import numpy as np
+# import matplotlib.pyplot as plt
+
+# from io import StringIO
+
+# # Read the file and split by '*'
+# with open("./build/data.csv", "r") as f:
+#     raw_data = f.read()
+
+# # Split into chunks using '*' as the delimiter
+# object_chunks = raw_data.split("*")
+
+# # Filter out empty or whitespace-only chunks
+# object_chunks = [chunk.strip() for chunk in object_chunks if chunk.strip()]
+
+# # Store parsed data
+# parsed_objects = []
+
+# for chunk in object_chunks:
+#     # Remove any lines that are just commas or whitespace
+#     clean_lines = [line for line in chunk.splitlines() if line.strip(',').strip()]
     
-    # Check if the data loaded successfully and has multiple columns
-    if data.size > 0 and data.shape[1] > 1:  # Ensure there are multiple columns
-        print(f"Data loaded successfully with shape {data.shape}.")
-        
-        # Plot each column (state vector component) over time
-        time_steps = np.arange(data.shape[0])  # Time steps based on number of rows
-        
-        # Plot only every 200th state vector for labeling
-        for i in range(0, data.shape[1], 200):  # Every 200th state vector for labeling
-            plt.plot(time_steps, data[:, i], label=f'State Vector {i+1}')  # Label selected state vectors
-        
-        # Label the axes and title
-        plt.xlabel('Time Step')
-        plt.ylabel('State Vector Value')
-        plt.title('State Vectors Over Time')
-        plt.legend()
+#     if not clean_lines:
+#         continue
 
-        # Save the plot to a file (for example, in PNG format)
-        plt.savefig('state_vectors_plot.png')  # You can specify a different path or format
-        print("Plot saved as 'state_vectors_plot.png'.")
+#     try:
+#         data = np.genfromtxt(StringIO("\n".join(clean_lines)), delimiter=",", filling_values=np.nan)
+        
+#         if data.ndim == 1:
+#             data = np.expand_dims(data, axis=0)
+        
+#         if data.shape[0] >= 2:  # Must have at least two rows to extract X and Y
+#             parsed_objects.append(data)
+#         else:
+#             print("Skipped a chunk due to insufficient rows.")
 
-        # Optionally, display the plot
-        plt.show()
+#     except Exception as e:
+#         print(f"Error parsing chunk: {e}")
 
-    else:
-        print("Data doesn't have the expected number of columns.")
-except ValueError as e:
-    print("Error in loading data:", e)
-    print("Check if there are malformed rows or excessive columns.")
+# # Plotting
+# num_objects = len(parsed_objects)
+# if num_objects == 0:
+#     print("No valid object data found.")
+# else:
+#     cols = min(3, num_objects)
+#     rows = (num_objects + cols - 1) // cols  # ceiling division for rows
+
+#     fig, axs = plt.subplots(rows, cols, figsize=(5 * cols, 4 * rows), squeeze=False)
+
+#     for idx, data in enumerate(parsed_objects):
+#         row = idx // cols
+#         col = idx % cols
+#         ax = axs[row][col]
+
+#         x_values = data[0, :]
+#         y_values = data[1, :]
+
+#         ax.plot(x_values, y_values, color='blue', linewidth=2, linestyle='dashed')
+#         ax.set_title(f'Object {idx + 1}')
+#         ax.set_xlabel('X position')
+#         ax.set_ylabel('Y position')
+
+#     # Hide unused subplots
+#     for idx in range(num_objects, rows * cols):
+#         fig.delaxes(axs[idx // cols][idx % cols])
+
+#     fig.suptitle('2D Plots of State Vectors for All Objects', fontsize=16)
+#     plt.tight_layout(rect=[0, 0.03, 1, 0.95])  # Adjust layout to fit title
+#     plt.savefig('all_objects_subplot.png')
+#     plt.show()
+
+# import numpy as np
+# import matplotlib.pyplot as plt
+# from io import StringIO
+
+# # Read and filter lines before the first star, skipping empty lines
+# lines = []
+# with open("./build/data.csv", "r") as f:
+#     for line in f:
+#         if '*' in line:  # Stop reading if a star is encountered
+#             break
+#         if line.strip():  # Only add non-empty lines
+#             lines.append(line)
+
+# # Join the lines and pass to StringIO to simulate a file-like object
+# data_string = "".join(lines)
+
+# # Remove any trailing empty lines (or lines that contain only commas)
+# data_string = "\n".join([line for line in data_string.splitlines() if line.strip(',')])
+
+# # Now, we will use np.genfromtxt to read the data and handle malformed rows
+# try:
+#     data = np.genfromtxt(StringIO(data_string), delimiter=",", skip_header=0, filling_values=np.nan)
+    
+#     # Check if the data loaded successfully and has multiple rows
+#     if data.size > 0 and data.shape[0] > 1:  # Ensure there are multiple rows
+#         print(f"Data loaded successfully with shape {data.shape}.")
+        
+#         # Extract the first two rows (not columns) of each state vector
+#         x_values = data[0, :]  # First row (state vector 1)
+#         print(x_values)
+#         y_values = data[1, :]  # Second row (state vector 2)
+#         print(y_values)
+        
+#         # Create a 2D scatter plot using the first two rows
+#         plt.plot(x_values, y_values, color = 'blue', linewidth=3, linestyle='dashed')
+        
+#         # Label the axes and title
+#         plt.xlabel('X position')
+#         plt.ylabel('Y position')
+#         plt.title('2D Scatter Plot of State Vector X and Y positions')
+        
+#         # Save the plot to a file (for example, in PNG format)
+#         plt.savefig('state_vectors_scatterplot.png')  # You can specify a different path or format
+#         print("Scatter plot saved as 'state_vectors_scatterplot.png'.")
+
+#         # Optionally, display the plot
+#         plt.show()
+
+#     else:
+#         print("Data doesn't have the expected number of rows.")
+# except ValueError as e:
+#     print("Error in loading data:", e)
+#     print("Check if there are malformed rows or excessive columns.")
+
 
 
 

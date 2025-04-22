@@ -26,8 +26,11 @@ int writeDoubles(double data[][1000][8])
           for (int j = 0; j < 1000; j++) {
 
           
+            if (j != 999) {
               myfile << data[k][j][i] << ",";
-          
+            } else {
+                myfile << data[k][j][i];
+            }
 
           }
           myfile << std::endl;
