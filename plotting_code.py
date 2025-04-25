@@ -66,3 +66,5 @@ else:
     plt.tight_layout()
     plt.savefig("all_objects_one_plot.png")
     plt.show()
+
+
