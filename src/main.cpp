@@ -5,6 +5,7 @@
 #include "include/linearMotion.h"
 #include <cmath>
 #include <random>
+#include "include/write.h"
 
 int main()
 {
