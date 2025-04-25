@@ -10,7 +10,7 @@
 int main()
 {
     double delta_t = 0.1;
-    int SIZE = 100;
+    int SIZE = 1; // the number of objects
     
     // intialize an array of 10 linear motion objects
     LinearMotion *lms[SIZE];
@@ -125,7 +125,7 @@ int main()
     }
     std::random_device rd;
     std::mt19937 gen(rd());
-    std::uniform_real_distribution<> accel_dist(-3.0, 3.0);
+    std::uniform_real_distribution<> accel_dist(0, 3.0);
 
     
     // print hello to that this is multi kalman
@@ -220,7 +220,7 @@ int main()
     //printf("Time taken: %f ms\n", (end - start)*1000);
     printf("Time taken: %.2f ms\n", (end - start) * 1000);
 
-    int success = writeDoubles(writingMatrix);
+    int success = writeDoubles(writingMatrix, SIZE);
 	
 	std::cout << success << "<- Success value of writing data";
 

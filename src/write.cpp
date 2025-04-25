@@ -2,7 +2,7 @@
 #include <fstream>
 #include "include/write.h"
 
-int writeDoubles(double data[][1000][8])
+int writeDoubles(double data[][1000][8], int SIZE)
 {
       std::cout << "Writing started" << std::endl;
 
@@ -19,7 +19,7 @@ int writeDoubles(double data[][1000][8])
 
       // write first 8000 values of data into file
 
-      for (int k = 0; k < 10; k++) {
+      for (int k = 0; k < SIZE; k++) {
 
         for (int i = 0; i < 8; i++) {
 
