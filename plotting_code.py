@@ -1,76 +1,68 @@
-# plotting code using matplotlib in python
-
-import matplotlib.pyplot as plt
 import numpy as np
-import pandas as pd
+import matplotlib.pyplot as plt
+from io import StringIO
 
-# Read the CSV file
-data1 = np.genfromtxt('file1.csv', delimiter=',', skip_header=1)
+# Read file
+with open("./build/data.csv", "r") as f:
+    raw_data = f.read()
 
-# Display the data
-print(data1)
+# Split by object
+object_chunks = [chunk.strip() for chunk in raw_data.split("*") if chunk.strip()]
+print(object_chunks)
 
-x = data1[:, 0]
-y = data1[:, 1]
+parsed_objects = []
 
-print(x)
-print(y)
+for i, chunk in enumerate(object_chunks):
+    lines = [line for line in chunk.splitlines() if line.strip(',').strip()]
+    if not lines:
+        print(f"Object {i+1} has no valid lines.")
+        continue
 
+    try:
+        # Parse the data
+        data = np.genfromtxt(StringIO("\n".join(lines)), delimiter=",", filling_values=np.nan)
 
-plt.scatter(x, y)
+        # Check for abnormal or overflow values (e.g., values that are too large or too small)
+        if np.any(np.abs(data) > 1e10):  # Replace with a threshold value suitable for your data
+            print(f"Warning: Object {i+1} contains unusually large values, replacing with NaN.")
+            data[np.abs(data) > 1e10] = np.nan  # Replace abnormal values with NaN
 
+        # If data has only one row, reshape it
+        if data.ndim == 1:
+            data = np.expand_dims(data, axis=0)
 
+        # Ensure the object has enough rows
+        if data.shape[0] >= 2:
+            parsed_objects.append(data)
+            print(f"Parsed Object {i+1}: shape {data.shape}")
+        else:
+            print(f"Object {i+1} skipped — not enough rows.")
+    except Exception as e:
+        print(f"Error parsing Object {i+1}: {e}")
 
-plt.plot([1, 2, 3, 4])
+# Plotting
+if not parsed_objects:
+    print("No valid object data parsed.")
+else:
+    plt.figure(figsize=(10, 8))
 
-plt.ylabel('test')
+    for idx, data in enumerate(parsed_objects):
+        # Exclude NaN values before plotting
+        x = data[0, :]
+        y = data[1, :]
+        
+        # Remove NaN values
+        valid_indices = np.isfinite(x) & np.isfinite(y)
+        x_valid = x[valid_indices]
+        y_valid = y[valid_indices]
+        
+        plt.plot(x_valid, y_valid, label=f"Object {idx + 1}", linewidth=2)
 
-plt.show()
-
-data = {'a': np.arange(50),
-        'c': np.random.randint(0, 50, 50),
-        'd': np.random.randn(50)}
-data['b'] = data['a'] + 10 * np.random.randn(50)
-data['d'] = np.abs(data['d']) * 100
-
-plt.scatter('a', 'b', c='c', s='d', data=data)
-plt.xlabel('entry a')
-plt.ylabel('entry b')
-plt.show()
-
-names = ['group_a', 'group_b', 'group_c']
-values = [1, 10, 100]
-
-plt.figure(figsize=(9, 3))
-
-plt.subplot(131)
-plt.bar(names, values)
-plt.subplot(132)
-plt.scatter(names, values)
-plt.subplot(133)
-plt.plot(names, values)
-plt.suptitle('Categorical Plotting')
-plt.show()
-
-names = ['group_a', 'group_b', 'group_c']
-values = [1, 10, 100]
-
-plt.figure(figsize=(9, 3))
-
-plt.subplot(131)
-plt.bar(names, values)
-plt.subplot(132)
-plt.scatter(names, values)
-plt.subplot(133)
-plt.plot(names, values, linewidth=4.0)
-plt.suptitle('Categorical Plotting')
-plt.show()
-
-fig = plt.figure()
-ax = fig.add_subplot(projection='3d')
-
-ax.set_xlabel('X Label')
-ax.set_ylabel('Y Label')
-ax.set_zlabel('Z Label')
-
-plt.show()
+    plt.title("2D Trajectories of All Objects")
+    plt.xlabel("X Position")
+    plt.ylabel("Y Position")
+    plt.legend()
+    plt.grid(True)
+    plt.tight_layout()
+    plt.savefig("all_objects_one_plot.png")
+    plt.show()
