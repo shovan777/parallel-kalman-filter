@@ -18,33 +18,33 @@ extern "C" {
 // just print hello world with cout
 int kalmanfiltering()
 {
-    float delta_t = 0.1;
+    double delta_t = 0.1;
     LinearMotion lm = LinearMotion(
         // motion starts at rest
-        new matrix{2, 1, new float[2]{0.0, 0.0}},
-        new matrix{2, 2, new float[4]{1.0, delta_t, 0, 1}},
-        new matrix{2, 1, new float[2]{0, delta_t}});
+        new matrix{2, 1, new double[2]{0.0, 0.0}},
+        new matrix{2, 2, new double[4]{1.0, delta_t, 0, 1}},
+        new matrix{2, 1, new double[2]{0, delta_t}});
 
     // initialize
     // state covariance matrix
-    matrix *stateCOVMat = new matrix{2, 2, new float[4]{0.01, 0.0, 0.0, 0.01}};
+    matrix *stateCOVMat = new matrix{2, 2, new double[4]{0.01, 0.0, 0.0, 0.01}};
     // printf("State covariance matrix:\n");
     // display_matrix(stateCOVMat);
     // process noise covariance matrix
-    matrix *processCOVMat = new matrix{2, 2, new float[4]{0.01, 0.0, 0.0, 0.01}};
+    matrix *processCOVMat = new matrix{2, 2, new double[4]{0.01, 0.0, 0.0, 0.01}};
     // printf("Process noise covariance matrix:\n");
     // display_matrix(processCOVMat);
     // measurement noise covariance matrix
-    // matrix *measurementCOVMat = new matrix{2, 2, new float[4]{0.0, 0.05, 0.0, 0.05}};
-    matrix *measurementCOVMat = new matrix{1, 1, new float[1]{0.01}};
+    // matrix *measurementCOVMat = new matrix{2, 2, new double[4]{0.0, 0.05, 0.0, 0.05}};
+    matrix *measurementCOVMat = new matrix{1, 1, new double[1]{0.01}};
     // printf("Measurement noise covariance matrix:\n");
     // display_matrix(measurementCOVMat);
     // kalman gain matrix
-    matrix *kalmanGainMat = new matrix{2, 1, new float[2]{0.0, 0.0}};
+    matrix *kalmanGainMat = new matrix{2, 1, new double[2]{0.0, 0.0}};
     // printf("Kalman gain matrix:\n");
     // display_matrix(kalmanGainMat);
     // measurement matrix
-    matrix *measurementMat = new matrix{1, 2, new float[2]{1.0, 0.0}};
+    matrix *measurementMat = new matrix{1, 2, new double[2]{1.0, 0.0}};
     // printf("Measurement matrix:\n");
     // display_matrix(measurementMat);
     
@@ -54,12 +54,12 @@ int kalmanfiltering()
     for (int i = 0; i < 10; i++)
     {
         // for constant acceleration
-        float accel = 2.0;
+        double accel = 2.0;
         // TODO: do for variable acceleration
         // TODO: add noise to the acceleration
 
         // prediction step
-        matrix *input_vec = new matrix{1, 1, new float[1]{accel}};
+        matrix *input_vec = new matrix{1, 1, new double[1]{accel}};
 
         //  prediction step
         //  x = Fx + Bu
@@ -85,7 +85,7 @@ int kalmanfiltering()
         //  innovation/error
         //  y_err = z - Hx
         // measurement vector should be supplied from external sensor
-        matrix *y_err = mat_sub(new matrix{1, 1, new float[1]{0.0}}, mat_mul(measurementMat, lm.getStateVector()));
+        matrix *y_err = mat_sub(new matrix{1, 1, new double[1]{0.0}}, mat_mul(measurementMat, lm.getStateVector()));
         // printf("y_err: %f\n");
         // display_matrix(y_err);
 
@@ -99,7 +99,7 @@ int kalmanfiltering()
 
 
         //  P = (I - KH)P
-        stateCOVMat = mat_mul(mat_sub(new matrix{2, 2, new float[4]{1.0, 0.0, 0.0, 1.0}}, mat_mul(kalmanGainMat, measurementMat)), stateCOVMat);
+        stateCOVMat = mat_mul(mat_sub(new matrix{2, 2, new double[4]{1.0, 0.0, 0.0, 1.0}}, mat_mul(kalmanGainMat, measurementMat)), stateCOVMat);
         // printf("State covariance matrix after correction: \n");
         // display_matrix(stateCOVMat);
         // looks good up to this point
@@ -114,7 +114,7 @@ int kalmanfiltering()
 
     //plotter();
 
-    int success = writeDoubles(data);
+    int success = writedoubles(data);
 
     std::cout << success;
     // free the memory allocated for the matrices

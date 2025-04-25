@@ -6,7 +6,7 @@ struct matrix
 {
     int rows;
     int cols;
-    float *data;
+    double *data;
 };
 
 matrix *mat_mul(matrix *A, matrix *B);
