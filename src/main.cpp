@@ -28,6 +28,9 @@ int main()
 
     matrix *measurementMats[SIZE];
 
+    // initialize the writing matrix
+	double writingMatrix[SIZE][1000][8];
+
     for (int i = 0; i < SIZE; i++)
     {
         // we are randomizing height between 50 and 150 pixels which is kinda common
@@ -204,6 +207,10 @@ int main()
             // looks good up to this point
 
             //std::cout << "State vector after " << i << " time steps: [" << lm.getStateVector()->data[0] << ", " << lm.getStateVector()->data[1] << "]" << std::endl;
+
+            for (int j = 0; j < 8; j++) {
+				writingMatrix[k][i][j] = lms[k]->getStateVector()->data[j];
+			}
 
             free(input_vec->data);
             free(input_vec);
