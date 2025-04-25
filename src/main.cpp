@@ -213,6 +213,10 @@ int main()
     //printf("Time taken: %f ms\n", (end - start)*1000);
     printf("Time taken: %.2f ms\n", (end - start) * 1000);
 
+    int success = writeDoubles(writingMatrix);
+	
+	std::cout << success << "<- Success value of writing data";
+
 
     return 0;
 }
