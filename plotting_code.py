@@ -22,10 +22,10 @@ for i, chunk in enumerate(object_chunks):
         # Parse the data
         data = np.genfromtxt(StringIO("\n".join(lines)), delimiter=",", filling_values=np.nan)
 
-        # Check for abnormal or overflow values (e.g., values that are too large or too small)
-        if np.any(np.abs(data) > 1e10):  # Replace with a threshold value suitable for your data
+        # Check for abnormal or overflow values
+        if np.any(np.abs(data) > 1e10):
             print(f"Warning: Object {i+1} contains unusually large values, replacing with NaN.")
-            data[np.abs(data) > 1e10] = np.nan  # Replace abnormal values with NaN
+            data[np.abs(data) > 1e10] = np.nan
 
         # If data has only one row, reshape it
         if data.ndim == 1:
@@ -47,22 +47,19 @@ else:
     plt.figure(figsize=(10, 8))
 
     for idx, data in enumerate(parsed_objects):
-        # Exclude NaN values before plotting
         x = data[0, :]
         y = data[1, :]
-        
-        # Remove NaN values
         valid_indices = np.isfinite(x) & np.isfinite(y)
         x_valid = x[valid_indices]
         y_valid = y[valid_indices]
-        
-        plt.plot(x_valid, y_valid, label=f"Object {idx + 1}", linewidth=2)
 
-    plt.title("2D Trajectories of All Objects")
+        plt.scatter(x_valid, y_valid, label=f"Object {idx + 1}", s=10)  # Changed to scatter
+
+    plt.title("2D Trajectories of All Objects (Scatter Plot)")
     plt.xlabel("X Position")
     plt.ylabel("Y Position")
     plt.legend()
     plt.grid(True)
     plt.tight_layout()
-    plt.savefig("all_objects_one_plot.png")
+    plt.savefig("all_objects_one_scatter_plot.png")
     plt.show()
