@@ -9,8 +9,8 @@
 
 int main()
 {
-    double delta_t = 0.1;
-    int SIZE = 1; // the number of objects
+    double delta_t = 0.001;
+    int SIZE = 10; // the number of objects
     
     // intialize an array of 10 linear motion objects
     LinearMotion *lms[SIZE];
@@ -125,7 +125,7 @@ int main()
     }
     std::random_device rd;
     std::mt19937 gen(rd());
-    std::uniform_real_distribution<> accel_dist(0, 3.0);
+    std::uniform_real_distribution<> accel_dist(0, 5.0);
 
     
     // print hello to that this is multi kalman
