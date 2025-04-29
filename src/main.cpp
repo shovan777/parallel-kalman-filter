@@ -10,7 +10,7 @@
 int main()
 {
     double delta_t = 0.001;
-    int SIZE = 10; // the number of objects
+    int SIZE = 1; // the number of objects
     
     // intialize an array of 10 linear motion objects
     LinearMotion *lms[SIZE];
@@ -145,7 +145,8 @@ int main()
             // fixed and height of predestrians does not change
             double accelx = accel_dist(gen); // acceleration in x direction
             double accely = accel_dist(gen); // acceleration in y direction
-            double accela = ((double)rand() / RAND_MAX) * 0.2 - 0.1; // acceleration in angular direction
+            //double accela = ((double)rand() / RAND_MAX) * 0.2 - 0.1; // acceleration in angular direction
+            double accela = 1 * 0.2 - 0.1; // acceleration in angular direction
             double accelh = 0.0;
 
             // for constant acceleration
