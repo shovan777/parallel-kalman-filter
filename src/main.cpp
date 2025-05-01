@@ -10,7 +10,7 @@
 int main()
 {
     double delta_t = 0.001;
-    int SIZE = 1; // the number of objects
+    int SIZE = 140; // the number of objects
     
     // intialize an array of 10 linear motion objects
     LinearMotion *lms[SIZE];
