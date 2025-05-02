@@ -11,7 +11,7 @@
 
 # Load modules (uncomment if your environment needs these)
 module purge
-module load gcc
+module load gcc/
 module load cmake
 
 # Move to your project directory

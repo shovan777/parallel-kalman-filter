@@ -13,7 +13,11 @@ if(OpenMP_CXX_FOUND)
 else()
     message(FATAL_ERROR "OpenMP not found")
 endif()
+# find mpi package
+find_package(MPI REQUIRED)
+
 # add the src directory to the include path
+include_directories(SYSTEM ${MPI_INCLUDE_PATH})
 include_directories(src)
 
 # add_subdirectory(matplotplusplus)
@@ -32,6 +36,7 @@ file(GLOB MAIN
 )
 
 add_executable(parallelkalman ${MAIN})
+target_link_libraries(parallelkalman ${MPI_LIBRARIES} ${OpenMP_CXX_LIBRARIES})
 add_executable(test_matops src/matops.cpp src/test_matops.cpp)
 
 
