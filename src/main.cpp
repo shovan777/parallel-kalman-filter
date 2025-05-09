@@ -5,11 +5,12 @@
 #include "include/linearMotion.h"
 #include <cmath>
 #include <random>
+#include "include/write.h"
 
 int main()
 {
-    double delta_t = 0.1;
-    int SIZE = 100;
+    double delta_t = 0.001;
+    int SIZE = 140; // the number of objects
     
     // intialize an array of 10 linear motion objects
     LinearMotion *lms[SIZE];
@@ -26,6 +27,9 @@ int main()
     matrix *kalmanGainMats[SIZE];
 
     matrix *measurementMats[SIZE];
+
+    // initialize the writing matrix
+	double writingMatrix[SIZE][1000][8];
 
     for (int i = 0; i < SIZE; i++)
     {
@@ -121,7 +125,7 @@ int main()
     }
     std::random_device rd;
     std::mt19937 gen(rd());
-    std::uniform_real_distribution<> accel_dist(-3.0, 3.0);
+    std::uniform_real_distribution<> accel_dist(0, 5.0);
 
     
     // print hello to that this is multi kalman
@@ -141,7 +145,8 @@ int main()
             // fixed and height of predestrians does not change
             double accelx = accel_dist(gen); // acceleration in x direction
             double accely = accel_dist(gen); // acceleration in y direction
-            double accela = ((double)rand() / RAND_MAX) * 0.2 - 0.1; // acceleration in angular direction
+            //double accela = ((double)rand() / RAND_MAX) * 0.2 - 0.1; // acceleration in angular direction
+            double accela = 1 * 0.2 - 0.1; // acceleration in angular direction
             double accelh = 0.0;
 
             // for constant acceleration
@@ -204,6 +209,10 @@ int main()
 
             //std::cout << "State vector after " << i << " time steps: [" << lm.getStateVector()->data[0] << ", " << lm.getStateVector()->data[1] << "]" << std::endl;
 
+            for (int j = 0; j < 8; j++) {
+				writingMatrix[k][i][j] = lms[k]->getStateVector()->data[j];
+			}
+
             free(input_vec->data);
             free(input_vec);
         }
@@ -211,6 +220,10 @@ int main()
     double end = omp_get_wtime();
     //printf("Time taken: %f ms\n", (end - start)*1000);
     printf("Time taken: %.2f ms\n", (end - start) * 1000);
+
+    int success = writeDoubles(writingMatrix, SIZE);
+	
+	std::cout << success << "<- Success value of writing data";
 
 
     return 0;
